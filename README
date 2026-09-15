@@ -1,0 +1,59 @@
+Bar is a minimal status bar for the River Wayland compositor,
+written in Zig.
+
+WHAT IS BAR?
+
+Bar draws itself with a built-in 9x15 bitmap font and the standard
+Wayland shared-memory buffers. It shows the tags of every output,
+a clock, and any status text you feed it on standard input. It has
+no dependencies beyond libwayland and the Wayland protocols the
+compositor itself uses.
+
+BUILDING
+
+You need Zig and libwayland-devel.
+
+        zig build -Doptimize=ReleaseFast
+
+The binary lands in zig-out/bin/bar.
+
+RUNNING
+
+By itself it shows the tags and the clock:
+
+        ./zig-out/bin/bar
+
+Feed it status text on stdin to get a status section:
+
+        while true; do echo "$(uptime)"; sleep 1; done | ./zig-out/bin/bar
+
+Start it from your River configuration:
+
+        riverctl spawn "sh -c 'while true; do bstatus; sleep 1;
+                     done | /path/to/bar'"
+
+Note that riverctl spawn runs the command from the compositor's
+working directory and discards its output. Use an absolute path.
+
+DEBUGGING
+
+When you have no Wayland screenshot tool, set BAR_DUMP to a file
+and the first drawn frame is written there as raw ARGB pixels:
+
+        BAR_DUMP=/tmp/bar.argb ./zig-out/bin/bar
+
+LAYOUT
+
+The bar, left to right: the tags of each output as digit blocks
+(focused inverted, urgent red), the date and time, then the status
+text from standard input.
+
+The source tree:
+
+  src/        the bar
+  protocol/   vendored Wayland protocol definitions
+  build.zig   the build plumbing
+
+LICENSE
+
+MIT. See LICENSE.
